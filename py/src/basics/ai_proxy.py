@@ -17,8 +17,8 @@ openai = OpenAI(
 )
 
 
-async def main():
-    response = await openai.chat.completions.create(
+def main():
+    response =  openai.chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": "Hello, how are you?"}],
         seed=42,  # Optional: set a seed to invoke the AI Proxy's cache
@@ -28,5 +28,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main()) 
+  main()
