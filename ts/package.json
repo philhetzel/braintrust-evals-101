@@ -1,0 +1,28 @@
+{
+  "name": "braintrust-evals-ts",
+  "version": "1.0.0",
+  "description": "TypeScript tutorial for AI and LLM evaluations using Braintrust",
+  "main": "dist/index.js",
+  "scripts": {},
+  "keywords": [
+    "braintrust",
+    "ai",
+    "llm",
+    "evaluation",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "autoevals": "^0.0.129",
+    "braintrust": "^0.0.205",
+    "dotenv": "^16.3.1",
+    "openai": "^4.20.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.5",
+    "@types/node": "^20.8.0",
+    "tsx": "^3.14.0",
+    "typescript": "^5.2.0"
+  }
+}
