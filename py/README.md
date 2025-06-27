@@ -70,13 +70,13 @@ This tutorial covers several key evaluation scenarios:
 
 ## Anatomy of custom scorers
 ### What is an Eval?
-[What is an Eval](../assets/WhatIsAnEval.png)
+![What is an Eval](../assets/WhatIsAnEval.png)
 
 ### Code-based custom scorers
-[Code based custom scorers](../assets/AnatomyOfCodeBasedScorer.png)
+![Code based custom scorers](../assets/AnatomyOfCodeBasedScorer.png)
 
 ### Custom LLM-as-a-judge scorers
-[Custom LLM-as-a-judge scorers](../assets/AnatomyOfLLMJudge.png)
+![Custom LLM-as-a-judge scorers](../assets/AnatomyOfLLMJudge.png)
 
 ## 🔧 Running Evaluations
 
