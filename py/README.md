@@ -96,7 +96,7 @@ An Eval is a way to judge the quality of some task or function's output. Usually
 - **Task**: Some function that takes an input and transforms it. Usually an LLM and prompt but can be either more or less complex.
 - **Scorers**: A function that judges the quality of an output between 0 and 1. Judgement can be made via an LLM-as-a-judge or a deterministic code-based function.
 
-![What is an Eval](assets/WhatIsAnEval.png)
+![What is an Eval](../assets/WhatIsAnEval.png)
 
 ### What does an Eval look like:
 
@@ -163,7 +163,7 @@ brevity_check = LLMClassifier(
 )
 ```
 
-![Custom LLM-as-a-judge](assets/AnatomyOfLLMJudge.png)
+![Custom LLM-as-a-judge](../assets/AnatomyOfLLMJudge.png)
 
 ## Creating a custom code-cased scorer
 
@@ -180,4 +180,4 @@ def determine_exact_match(output: str, expected: str): #can include input, outpu
         "name": "Custom Exact Match",
     }
 ```
-![Custom code scorer](assets/AnatomyOfCodeBasedScorer.png)
+![Custom code scorer](../assets/AnatomyOfCodeBasedScorer.png)
