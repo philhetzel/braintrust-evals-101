@@ -88,57 +88,52 @@ This tutorial covers several key evaluation scenarios:
 - **Task**: Write custom scorers
 - **Learning**: How to to use inputs, outputs, expected outputs, and metadata in scorers.
 
-## Anatomy of Custom Scorers
+## What is an Eval?
 
-Custom scorers are the heart of effective AI evaluations. They judge the quality of an output on a scale from 0 to 1, allowing you to quantify how well your AI system performs on specific tasks.
+### Description
+An Eval is a way to judge the quality of some task or function's output. Usually that task is an LLM and prompt but that is not always the case. Evals are made up of three things:
+- **Data**: An array of inputs that you want to place into a task to create outputs. Can also include the expected values after a task transforms the input as well as any metadata of interest.
+- **Task**: Some function that takes an input and transforms it. Usually an LLM and prompt but can be either more or less complex.
+- **Scorers**: A function that judges the quality of an output between 0 and 1. Judgement can be made via an LLM-as-a-judge or a deterministic code-based function.
 
-### What is an Eval?
-![What is an Eval](../assets/WhatIsAnEval.png)
+![What is an Eval](assets/WhatIsAnEval.png)
 
-An evaluation consists of three main components:
-- **Dataset**: Input/expected output pairs that represent your test cases
-- **Task**: The AI system or function you're evaluating
-- **Scorers**: Functions that measure how well the task output matches expectations
+### What does an Eval look like:
 
-### Two Types of Custom Scorers
+```python
+ Eval("Name of your Braintrust Project",
+      task=task,  # your task function's identifier. The Eval assumes that the task has arguments of input and hooks
+      data=init_dataset(project=project_name, dataset="WeatherActivityDataset"),  # your data with inputs and optional metadata and expected fields. This example pulls a dataset from Braintrust directly however you can load any data into an Eval as long as it has a field called
+   "input"
+      scores=[tool_call_check, structure_check, faithfulness_check]  # function identifiers for scores.
+  )
+```
 
-#### 1. Code-Based Custom Scorers
-![Code based custom scorers](../assets/AnatomyOfCodeBasedScorer.png)
+### How do I run an Eval?
 
-Code-based scorers give you complete programmatic control over evaluation logic. They can:
-- Take up to four arguments: `input`, `output`, `expected`, and `metadata`
-- Implement arbitrarily complex scoring algorithms
-- Return a score between 0 and 1
-- Access task metadata for context-aware scoring
+In Braintrust, Eval experiments can be run via the command line. If writing your evals in python, you can initiate a Braintrust experiment by running:
 
-**Example use cases:**
-- Mathematical accuracy checking
-- JSON format validation
-- Custom similarity metrics
-- Domain-specific business logic
+```bash
+braintrust eval path/to/eval/eval_filename.py
+```
 
-##### Creating a custom code-cased scorer
+## How do Eval tasks work?
 
-You can also create a function to score the outputs of your Eval task. Like Eval tasks, code based scorers can be of arbitrary complexity. They can (but don't always have to) take four arguments:
-- `input`: Is derived from the evaluation case dataset's input field.
-- `output`: Is derived from the Eval task's returned output
-- `expected`: Is derived from the evaluation case dataset's expected field
-- `metadata`: Is derived from both the evaluation case dataset's metadata field OR any information written to `hooks.metadata` during the task's execution
+Eval tasks are a blank slate - usually Eval tasks are a combination of a prompt and a model; however, Eval tasks can be much more complicated (or even much simpler) than that! When setting up an Eval task, create a function that has two arguments: `input` and `hooks`.
+- `input`: When running `Eval()` in Braintrust, `Eval()` is going to pass the `data`'s input field dynamically to the function assigned to the `task` argument. Inputs can be as simple as a string or as complex as a multi turn conversation with multi-modal attachments. 
+- `hooks`: Hooks is an object that you can use to either retrieve or write metadata to an Eval task. An example: let's imagine that you are running a RAG pipeline. The output returned by your task should be the assistant's final reponse but you may want to keep the context that your LLM brought back from a vector dataset. You can assign the context brought back from the vector database to `hooks.metadata["context"]`, and then retrieve that information later in a scoring function.
 
-#### 2. LLM-as-a-Judge Scorers
-![Custom LLM-as-a-judge scorers](../assets/AnatomyOfLLMJudge.png)
+```python
+def task(input, hooks):
+      # transform your input to create an output
+      task_output = input + "how's this for a transformation?"
 
-LLM-as-a-judge scorers use language models to evaluate outputs, perfect for nuanced or subjective criteria. They:
-- Use `LLMClassifierFromTemplate()` for TypeScript, `LLMClassifier()` function for python
-- Allow for dynamically providing information from your Dataset or Eval Task through the `{{input}}`, `{{output}}`, `{{expected}}`, and. `{{metadata}}` variables
-- Map LLM choices to numerical scores (0-1 scale)
-- Handle complex, contextual evaluation criteria
+      # write to a task's metadata
+      hooks.metadata["value_you_want_later"] = "See you in the scoring function!"
 
-**Example use cases:**
-- Content quality assessment
-- Tone and style evaluation
-- Factual accuracy checking
-- Creative output assessment
+      # send the task's output to a scoring function
+      return task_output
+```
 
 ## Creating a custom LLM-as-a-Judge scrorer
 
@@ -153,40 +148,37 @@ Often you will want to create an LLM with a prompt that determines the quality o
 - `model`: The LLM that you want to use for scoring
 - `use_cot`: Whether or not you want the prompt to be appended with chain-of-thought reasoning. Not to be confused with the reasoning component of newer models
 
+**Example:**
+```python
+brevity_check = LLMClassifier(
+    name="Brevity Check",
+    description="Check if the output is too long",
+    prompt_template="""
+    You are a helpful assistant that checks if the output is too long or too short.
+    The output is: {{output.short_history}}
 
-
-## 🔧 Running Evaluations
-
-**Important**: Always run evaluations from the `py` directory:
-
-```bash
-# Make sure you're in the py directory
-cd py
-
-# Activate the virtual environment
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Export environment variables from .env file
-# Unix/macOS
-export $(grep -v '^#' .env | xargs)
-
-# Windows
-for /f "usebackq tokens=1,2 delims==" %i in (".env") do if not "%i"=="#*" set %i=%j
-
-# Run evaluations
-braintrust eval src/evals/00_using_autoevals/using_autoevals.py
-braintrust eval src/evals/01_customizing_autoevals/customizing_autoevals.py
-braintrust eval src/evals/02_use_braintrust_objects/use_braintrust_objects.py
-braintrust eval src/evals/03_write_custom_scorers/write_custom_scorers.py
+    An output is too long if it is longer than 6 sentences. If it is too long, return "long". If it is not too long, return "brief".
+    """,
+    choice_scores={"brief": 1, "long": 0},
+    model="gpt-4o-mini"
+)
 ```
 
-Alternatively, you can run with `uv run` if you export the variables first:
-```bash
-# Unix/macOS
-export $(grep -v '^#' .env | xargs)
-uv run braintrust eval src/evals/00_using_autoevals/using_autoevals.py
+![Custom LLM-as-a-judge](assets/AnatomyOfLLMJudge.png)
 
-# Windows
-for /f "usebackq tokens=1,2 delims==" %i in (".env") do if not "%i"=="#*" set %i=%j
-uv run braintrust eval src/evals/00_using_autoevals/using_autoevals.py
-``` 
+## Creating a custom code-cased scorer
+
+You can also create a function to score the outputs of your Eval task. Like Eval tasks, code based scorers can be of arbitrary complexity. They can (but don't always have to) take four arguments:
+- `input`: Is derived from the evaluation case dataset's input field.
+- `output`: Is derived from the Eval task's returned output
+- `expected`: Is derived from the evaluation case dataset's expected field
+- `metadata`: Is derived from both the evaluation case dataset's metadata field OR any information written to `hooks.metadata` during the task's execution
+
+```python
+def determine_exact_match(output: str, expected: str): #can include input, output, expected, and metadata as arguments.
+    return {
+        "score": 1 if output == expected else 0,
+        "name": "Custom Exact Match",
+    }
+```
+![Custom code scorer](assets/AnatomyOfCodeBasedScorer.png)
