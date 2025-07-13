@@ -32,14 +32,15 @@ dataset = [
 # `input` originates in the input field of the Eval's data argument
 # `hooks` is an object that allows you to actively write to the task's metadata (potentially to use in scorers)
 # we'll talk more about hooks in the next example
-def process_inputs(input_text, hooks):
+def process_inputs(input, hooks):
     hooks.metadata["example"] = "writing to metadata" # Write to metadata during the task run
-    return input_text
+    
+    return input # what the task returns becomes the `output` of a task, which is then sent to scorers
 
 
 Eval(
     PROJECT_NAME,
-    data=lambda: dataset,
+    data=lambda: dataset, # data will have a mandatory `input` field, and optional `expected` and `metadata` fields. Datasets stored in Braintrust can be loaded direction through init_dataset()
     task=process_inputs,  # input and hooks are automatically passed to the task function
     scores=[
         ExactMatch,  # using ExactMatch from AutoEvals. Compares the output and expected values

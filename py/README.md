@@ -90,6 +90,8 @@ This tutorial covers several key evaluation scenarios:
 
 ## What is an Eval?
 
+[Watch this video for a complete explanation!](https://www.loom.com/share/827e68cd769f4e6ab1f1dec6ac61dc5f?sid=a5ae5a44-8f0c-4d0f-96de-bb156be5669e)
+
 ### Description
 An Eval is a way to judge the quality of some task or function's output. Usually that task is an LLM and prompt but that is not always the case. Evals are made up of three things:
 - **Data**: An array of inputs that you want to place into a task to create outputs. Can also include the expected values after a task transforms the input as well as any metadata of interest.
