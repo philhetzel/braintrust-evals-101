@@ -200,7 +200,7 @@ wheels = [
 [[package]]
 name = "braintrust-evals-py"
 version = "1.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "autoevals" },
     { name = "braintrust" },

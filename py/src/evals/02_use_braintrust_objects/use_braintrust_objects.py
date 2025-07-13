@@ -18,4 +18,4 @@ Eval(
 )
 
 # export BRAINTRUST_API_KEY=<YOUR_API_KEY>
-# uv run python -m braintrust eval src/evals/02_use_braintrust_objects/use_braintrust_objects.py 
+# braintrust eval src/evals/02_use_braintrust_objects/use_braintrust_objects.py 
