@@ -103,8 +103,7 @@ An Eval is a way to judge the quality of some task or function's output. Usually
 ```python
  Eval("Name of your Braintrust Project",
       task=task,  # your task function's identifier. The Eval assumes that the task has arguments of input and hooks
-      data=init_dataset(project=project_name, dataset="WeatherActivityDataset"),  # your data with inputs and optional metadata and expected fields. This example pulls a dataset from Braintrust directly however you can load any data into an Eval as long as it has a field called
-   "input"
+      data=init_dataset(project=project_name, dataset="WeatherActivityDataset"),  # your data with inputs and optional metadata and expected fields. This example pulls a dataset from Braintrust directly however you can load any data into an Eval as long as it has a field called "input"
       scores=[tool_call_check, structure_check, faithfulness_check]  # function identifiers for scores.
   )
 ```
