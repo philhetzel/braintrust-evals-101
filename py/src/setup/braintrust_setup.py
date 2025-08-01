@@ -2,7 +2,7 @@ import os
 import braintrust
 from braintrust import init_dataset
 from dotenv import load_dotenv
-
+import json
 load_dotenv(dotenv_path=".env")
 
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT")
@@ -220,7 +220,25 @@ def create_countries_dataset():
     return dataset
 
 
+def create_multiturn_dataset():
+    # Read the JSON file and extract input values
+    with open("src/setup/data/MultiturnDataset.json", "r") as f:
+        json_data = json.load(f)
+    
+    data = []
+    for item in json_data:
+        data.append({"input": item["input"]})
+    
+    # Create and populate the dataset
+    dataset = init_dataset(PROJECT_NAME, name="Multiturn", api_key=os.getenv("BRAINTRUST_API_KEY"))
+    for item in data:
+        dataset.insert(input=item["input"])
+    
+    return dataset
+
 if __name__ == "__main__":
-    create_countries_dataset()
+    #create_countries_dataset()
+    create_multiturn_dataset()
     project.publish()
     print("Countries dataset created successfully!") 
+    print("Multiturn dataset created successfully!") 

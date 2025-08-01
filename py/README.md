@@ -88,6 +88,14 @@ This tutorial covers several key evaluation scenarios:
 - **Task**: Write custom scorers
 - **Learning**: How to to use inputs, outputs, expected outputs, and metadata in scorers.
 
+### 7. Multiturn conversation evaluation (`src/evals/04_multiturn/multiturn_scoring.py`)
+- **Task**: Evaluate multiturn chat conversations with custom LLM scorers
+- **Learning**: Using OpenAI Agents SDK, handling conversation history, custom scoring for AI impersonation detection and human escalation
+- **Key features**:
+  - Detects if AI pretends to be human
+  - Validates proper escalation to human agents when requested
+  - Integrates with OpenAI Agents SDK for tool calling
+
 ## What is an Eval?
 
 [Watch this video for a complete explanation!](https://www.loom.com/share/827e68cd769f4e6ab1f1dec6ac61dc5f?sid=a5ae5a44-8f0c-4d0f-96de-bb156be5669e)
