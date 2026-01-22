@@ -7,10 +7,10 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = ["braintrust", "ai", "llm", "evaluation", "python"]
 dependencies = [
-    "braintrust[cli]>=0.0.205",
+    "braintrust[cli]==0.5.0",
     "autoevals>=0.0.129",
     "python-dotenv>=1.0.0",
     "openai>=1.0.0",

@@ -65,18 +65,6 @@ def multiturn_task(input, hooks):
     # asyncio.run handles the async nature of the agent SDK
     result = asyncio.run(Runner.run(agent, messages))
     
-    # Extract tool calls from the agent's response
-    # result.to_input_list() returns all conversation items including tool calls
-    input_list = result.to_input_list()
-    tool_call_names = []
-    
-    # Look for function_call items to identify which tools were used
-    for item in input_list:
-        if isinstance(item, dict) and item.get('type') == 'function_call' and 'name' in item:
-            tool_call_names.append(item['name'])
-    
-    # Store tool calls in metadata for the scoring functions to access
-    hooks.metadata['tool_calls'] = tool_call_names
     
     return result.final_output
 
@@ -101,25 +89,25 @@ not_impersonating = LLMClassifier(
 )
 
 # Scorer 2: Check if escalation happens appropriately
-def proper_escalation(input, output, metadata):
+async def proper_escalation(input, output, metadata, trace):
     """Evaluate whether the agent escalated to human support appropriately.
-    
-    This scorer checks two conditions:
-    1. If user requested human help -> agent should escalate (score=1)
-    2. If user didn't request help -> agent shouldn't escalate (score=1)
-    
+
+    Uses trace level scoring to access tool spans directly, eliminating
+    the need for the task to manually track tool calls in metadata.
+
     Args:
         input: Contains the conversation messages
         output: The agent's final response (unused here)
-        metadata: Contains tool_calls from the task function
-    
+        metadata: Experiment metadata (unused here)
+        trace: Trace object providing access to spans from the task
+
     Returns:
         Dict with score (0 or 1) and name
     """
     # First, analyze if the user requested human assistance
     messages = input['messages']
     conversation = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
-    
+
     # Use an LLM to determine if the user requested human help
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -129,13 +117,19 @@ def proper_escalation(input, output, metadata):
         ],
         temperature=0
     )
-    
+
     user_requested_human = response.choices[0].message.content.strip().upper() == "YES"
-    
-    # Check if the agent actually called the escalation tool
-    tool_call_names = metadata.get('tool_calls', [])
-    escalation_called = 'escalate' in tool_call_names
-    
+
+    # Use trace level scoring to get tool spans directly
+    tool_spans = await trace.get_spans(span_type=["tool"])
+    tool_call_names = [
+        span.span_attributes.get("name")
+        for span in tool_spans
+        if span.span_attributes
+    ]
+    print(f"tools called: {tool_call_names}")
+    escalation_called = "escalate" in tool_call_names
+
     # Score based on whether escalation was appropriate
     if user_requested_human:
         # User wanted human help - agent should have escalated
