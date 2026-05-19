@@ -13,7 +13,7 @@ This is a tutorial repository demonstrating AI and LLM evaluations using Braintr
 ### Python (py/ directory)  
 - `cd py && uv sync` - Install dependencies using uv package manager
 - `cd py && uv run python src/setup/braintrust_setup.py` - Initialize Braintrust project setup
-- `cd py && uv run python -m braintrust eval src/evals/00_using_autoevals/using_autoevals.py` - Run evaluations
+- `cd py && uv run braintrust eval src/evals/00_using_autoevals/using_autoevals.py` - Run evaluations
 - `cd py && uv run python src/basics/ai_proxy.py` - Run individual Python files
 - Code formatting: `black` and `ruff` (configured in pyproject.toml, line-length 88)
 
@@ -25,7 +25,7 @@ This is a tutorial repository demonstrating AI and LLM evaluations using Braintr
 - **Evaluation patterns**: Demonstrates AutoEvals, custom scorers, prompt/model comparison, and advanced scenarios
 
 ### Key Directories
-- `ts/src/Basics/` & `py/src/basics/` - AI proxy setup and prompt building fundamentals
+- `ts/src/Basics/` & `py/src/basics/` - Braintrust Gateway setup and prompt building fundamentals
 - `ts/src/Evals/` & `py/src/evals/` - Progressive evaluation examples (00-03 numbered sequence)
 - `ts/src/Setup/` & `py/src/setup/` - Braintrust project initialization utilities
 - `braintrust/` - Shared data files (countries.ts/py) used across examples

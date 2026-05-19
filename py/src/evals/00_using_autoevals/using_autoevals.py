@@ -48,6 +48,3 @@ Eval(
     ],
     experiment_name="Using AutoEvals",
 )
-
-# export BRAINTRUST_API_KEY=<YOUR_API_KEY>
-# braintrust eval src/evals/00_using_autoevals/using_autoevals.py 
