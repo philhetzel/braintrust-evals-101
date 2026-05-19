@@ -2,9 +2,10 @@ import os
 from braintrust import Eval
 from autoevals import ExactMatch, EmbeddingSimilarity
 from dotenv import load_dotenv
-from typing import Dict, Any
+from pathlib import Path
 
-load_dotenv(dotenv_path="../../../.env")
+py_dir = Path(__file__).parents[3]
+load_dotenv(py_dir / ".env")
 
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT")
 
