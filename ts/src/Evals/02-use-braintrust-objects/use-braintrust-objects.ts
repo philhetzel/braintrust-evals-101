@@ -1,10 +1,12 @@
 import { loadPrompt, Eval, initFunction, initDataset } from "braintrust";
 import {ExactMatch, NumericDiff} from "autoevals"
 import dotenv from "dotenv";
+import * as path from "path";
 
-dotenv.config();
+// Load the single .env at the repo root (02-use-braintrust-objects -> Evals -> src -> ts -> root)
+dotenv.config({ path: path.resolve(__dirname, "../../../../.env") });
 
-const PROJECT_NAME: string = process.env.BRAINTRUST_PROJECT || "My App";
+const PROJECT_NAME: string = process.env.BRAINTRUST_PROJECT || "multiturn-agent";
 
 Eval(
     PROJECT_NAME, 

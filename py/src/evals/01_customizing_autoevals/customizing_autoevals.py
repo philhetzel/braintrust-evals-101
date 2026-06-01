@@ -2,9 +2,10 @@ import os
 from braintrust import Eval
 from autoevals import ExactMatch, EmbeddingSimilarity
 from dotenv import load_dotenv
-from typing import Dict, Any
+from pathlib import Path
 
-load_dotenv(dotenv_path="../../../.env")
+repo_root = Path(__file__).resolve().parents[4]  # file -> 01_customizing_autoevals -> evals -> src -> py -> root
+load_dotenv(repo_root / ".env")
 
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT")
 
@@ -35,11 +36,12 @@ def process_inputs(input_text, hooks):
     return input_text
 
 
+# Custom scorer wrapper
 # Normally the AutoEvals scorer compares the embedding similarity of the task's output and expected value
 # Here, we remap the expected value to the task's metadata.result field
 def determined_embedding_similarity(metadata: dict, output: str):
     return EmbeddingSimilarity().eval(
-        expected=metadata["next"],
+        expected=metadata["next"], # Useful when the "correct answer" lives inside metadata (e.g., the next item in a sequence, a chained step's target)
         output=output,
     )
 
@@ -63,6 +65,3 @@ Eval(
     ],
     experiment_name="Customizing AutoEvals",
 )
-
-# export BRAINTRUST_API_KEY=<YOUR_API_KEY>
-# braintrust eval customizing_autoevals.py 

@@ -4,9 +4,9 @@ from autoevals import ExactMatch, EmbeddingSimilarity
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load .env file from py directory (works from any directory)
-py_dir = Path(__file__).parents[3]  # Go up 3 levels: file -> 00_using_autoevals -> evals -> src -> py
-load_dotenv(py_dir / ".env")
+# Load the single .env at the repo root (works from any directory)
+repo_root = Path(__file__).resolve().parents[4]  # file -> 00_using_autoevals -> evals -> src -> py -> root
+load_dotenv(repo_root / ".env")
 
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT")
 
@@ -48,6 +48,3 @@ Eval(
     ],
     experiment_name="Using AutoEvals",
 )
-
-# export BRAINTRUST_API_KEY=<YOUR_API_KEY>
-# braintrust eval src/evals/00_using_autoevals/using_autoevals.py 

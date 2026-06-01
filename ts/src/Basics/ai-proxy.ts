@@ -2,8 +2,8 @@ import { OpenAI } from "openai";
 import * as dotenv from "dotenv";
 import * as path from "path";
 
-// Load .env file from the root directory
-dotenv.config();
+// Load the single .env at the repo root (Basics -> src -> ts -> root)
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 // Use any model that you have configured an API Key for in Braintrust
 // Accepted models are listed here: https://www.braintrust.dev/docs/guides/proxy#list-of-supported-models-and-providers
@@ -13,7 +13,7 @@ const MODEL = "claude-4-sonnet-20250514";
 // Configure an OpenAI client with the Braintrust API Key and the URL of the Braintrust AI proxy (URL shown is Braintrust's SaaS AI Proxy)
 const openai = new OpenAI({
     apiKey: process.env.BRAINTRUST_API_KEY,
-    baseURL: "https://api.braintrust.dev/v1/proxy",
+    baseURL: "https://gateway.braintrust.dev",
 });
 
 async function main() {

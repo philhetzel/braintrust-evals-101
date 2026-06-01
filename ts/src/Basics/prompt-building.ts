@@ -1,18 +1,19 @@
 import dotenv from "dotenv";
+import * as path from "path";
 import { loadPrompt } from "braintrust";
 import { OpenAI } from "openai";
 
-// Load environment variables from .env file
-dotenv.config();
+// Load the single .env at the repo root (Basics -> src -> ts -> root)
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 // Get the Braintrust project name from the environment variables
-const PROJECT_NAME: string = process.env.BRAINTRUST_PROJECT || "My App";
+const PROJECT_NAME: string = process.env.BRAINTRUST_PROJECT || "multiturn-agent";
 
 // Configure an OpenAI client with the Braintrust API Key and the URL of the Braintrust AI proxy (URL shown is Braintrust's SaaS AI Proxy)
 // "Building" a prompt will work without using the Braintrust AI Proxy as well as long as the model provider can accept OpenAI prompt arguments
 const openai = new OpenAI({
   apiKey: process.env.BRAINTRUST_API_KEY,
-  baseURL: "https://api.braintrust.dev/v1/proxy",
+  baseURL: "https://gateway.braintrust.dev",
 });
 
 async function main() {

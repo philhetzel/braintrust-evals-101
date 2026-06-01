@@ -2,60 +2,67 @@ import os
 import braintrust
 from braintrust import init_dataset
 from dotenv import load_dotenv
+from pathlib import Path
 import json
-load_dotenv(dotenv_path=".env")
+
+# Resolve paths relative to this file so the script works from any CWD.
+HERE = Path(__file__).resolve().parent  # setup/
+REPO_ROOT = HERE.parent                  # repo root
+DATA_FILE = HERE / "data" / "MultiturnDataset.json"
+
+load_dotenv(dotenv_path=REPO_ROOT / ".env")  # -> repo-root .env
 
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT")
 MODEL = os.getenv("PREFERRED_MODEL")
 
-project = braintrust.projects.create(name=PROJECT_NAME)
 
-country_structured_prompt = project.prompts.create(
-    name="Country Structured Prompt",
-    slug="country-structured-prompt",
-    model=MODEL,
-    if_exists="replace",
-    messages=[
-        {
-            "content": "You are a high school geography teacher and are helping students with their class projects. When a student asks you about a country, you will give facts about that country in a structured format.",
-            "role": "system"
-        },
-        {"content": "{{input}}", "role": "user"}
-    ],
-    params={
-        "use_cache": True,
-        "temperature": 0,
-        "response_format": {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "CountryStructure",
-                "schema": {
-                    "type": "object",
-                    "required": [
-                        "capital",
-                        "population",
-                        "currency",
-                        "language",
-                        "government",
-                        "area",
-                        "short_history"
-                    ],
-                    "properties": {
-                        "area": {"type": "number"},
-                        "capital": {"type": "string"},
-                        "currency": {"type": "string"},
-                        "language": {"type": "string"},
-                        "government": {"type": "string"},
-                        "population": {"type": "number"},
-                        "short_history": {"type": "string"}
+def create_country_prompt(project):
+    return project.prompts.create(
+        name="Country Structured Prompt",
+        slug="country-structured-prompt",
+        model=MODEL,
+        if_exists="replace",
+        messages=[
+            {
+                "content": "You are a high school geography teacher and are helping students with their class projects. When a student asks you about a country, you will give facts about that country in a structured format.",
+                "role": "system"
+            },
+            {"content": "{{input}}", "role": "user"}
+        ],
+        params={
+            "use_cache": True,
+            "temperature": 0,
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "CountryStructure",
+                    "schema": {
+                        "type": "object",
+                        "required": [
+                            "capital",
+                            "population",
+                            "currency",
+                            "language",
+                            "government",
+                            "area",
+                            "short_history"
+                        ],
+                        "properties": {
+                            "area": {"type": "number"},
+                            "capital": {"type": "string"},
+                            "currency": {"type": "string"},
+                            "language": {"type": "string"},
+                            "government": {"type": "string"},
+                            "population": {"type": "number"},
+                            "short_history": {"type": "string"}
+                        },
+                        "additionalProperties": False
                     },
-                    "additionalProperties": False
-                },
-                "strict": True
+                    "strict": True
+                }
             }
         }
-    }
-)
+    )
 
 
 def create_countries_dataset():
@@ -212,33 +219,45 @@ def create_countries_dataset():
         }
     ]
     
-    # Create and populate the dataset
+    # Create and populate the dataset. A stable `id` (the country name) makes
+    # re-running setup an upsert instead of appending duplicate rows.
     dataset = init_dataset(PROJECT_NAME, name="Countries", api_key=os.getenv("BRAINTRUST_API_KEY"))
     for item in data:
-        dataset.insert(input=item["input"], expected=item["expected"], metadata=item["metadata"])
-    
+        dataset.insert(
+            id=item["input"],
+            input=item["input"],
+            expected=item["expected"],
+            metadata=item["metadata"],
+        )
+
     return dataset
 
 
 def create_multiturn_dataset():
-    # Read the JSON file and extract input values
-    with open("src/setup/data/MultiturnDataset.json", "r") as f:
+    # Read the JSON file from setup/data (path resolved relative to this file)
+    with open(DATA_FILE, "r") as f:
         json_data = json.load(f)
-    
-    data = []
-    for item in json_data:
-        data.append({"input": item["input"]})
-    
-    # Create and populate the dataset
+
+    # Create and populate the dataset. `comparison_key` is a stable per-row hash
+    # in the export, so we use it as the `id` to keep re-runs idempotent; fall
+    # back to the row index if it's ever missing.
     dataset = init_dataset(PROJECT_NAME, name="Multiturn", api_key=os.getenv("BRAINTRUST_API_KEY"))
-    for item in data:
-        dataset.insert(input=item["input"])
-    
+    for index, item in enumerate(json_data):
+        dataset.insert(
+            id=item.get("comparison_key", f"multiturn-{index}"),
+            input=item["input"],
+        )
+
     return dataset
 
+
 if __name__ == "__main__":
-    #create_countries_dataset()
+    # Project + prompt creation live here (not at import time) so importing this
+    # module has no side effects on Braintrust.
+    project = braintrust.projects.create(name=PROJECT_NAME)
+    create_country_prompt(project)
+    create_countries_dataset()
     create_multiturn_dataset()
     project.publish()
-    print("Countries dataset created successfully!") 
-    print("Multiturn dataset created successfully!") 
+    print("Countries dataset created successfully!")
+    print("Multiturn dataset created successfully!")

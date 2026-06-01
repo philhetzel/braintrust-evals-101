@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 from openai import OpenAI
-from agents import Agent, Runner, function_tool, set_trace_processors, ToolCallItem
+from agents import Agent, Runner, function_tool, set_trace_processors
 from braintrust.wrappers.openai import BraintrustTracingProcessor
 import asyncio
 
@@ -18,11 +18,12 @@ set_trace_processors(
     [BraintrustTracingProcessor()]
 )
 
-# Load .env file from py directory (works from any directory)
-py_dir = Path(__file__).parents[3]  # Go up 3 levels: file -> 03_write_custom_scorers -> evals -> src -> py
-load_dotenv(py_dir / ".env")
+# Load the single .env at the repo root (works from any directory)
+repo_root = Path(__file__).resolve().parents[4]  # file -> 04_multiturn -> evals -> src -> py -> root
+load_dotenv(repo_root / ".env")
 
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT")
+MODEL = os.getenv("PREFERRED_MODEL", "gpt-4o-mini")  # Default to gpt-4o-mini if not set
 
 # Initialize the OpenAI client for the proper_escalation scorer
 # Using Braintrust proxy for unified API access and logging
