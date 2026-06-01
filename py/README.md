@@ -35,7 +35,7 @@ This tutorial demonstrates how to perform AI and LLM evaluations using [Braintru
    ```
 
 4. **Set up environment variables:**   
-   Create a `.env` file in the `py` directory and add your API keys:
+   Create a `.env` file in the project root directory and add your API keys:
    ```env
    BRAINTRUST_API_KEY=your_braintrust_api_key_here
    OPENAI_API_KEY=your_openai_api_key_here
@@ -54,7 +54,7 @@ This tutorial demonstrates how to perform AI and LLM evaluations using [Braintru
 
 6. **Load your sample Braintrust environment:**
    ```bash
-   uv run python src/setup/braintrust_setup.py
+   uv run python ../setup/braintrust_setup.py
    ```
 
    This will load a prompt and a dataset into a your Braintrust project named after your environment variable BRAINTRUST_PROJECT.

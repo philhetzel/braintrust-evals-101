@@ -27,7 +27,7 @@ This is a tutorial repository demonstrating AI and LLM evaluations using Braintr
 ### Key Directories
 - `ts/src/Basics/` & `py/src/basics/` - Braintrust Gateway setup and prompt building fundamentals
 - `ts/src/Evals/` & `py/src/evals/` - Progressive evaluation examples (00-03 numbered sequence)
-- `ts/src/Setup/` & `py/src/setup/` - Braintrust project initialization utilities
+- `setup/` - Braintrust project initialization utilities
 - `braintrust/` - Shared data files (countries.ts/py) used across examples
 
 ### Evaluation Execution Pattern
