@@ -4,8 +4,8 @@ from autoevals import ExactMatch, EmbeddingSimilarity
 from dotenv import load_dotenv
 from pathlib import Path
 
-py_dir = Path(__file__).parents[3]
-load_dotenv(py_dir / ".env")
+repo_root = Path(__file__).resolve().parents[4]  # file -> 01_customizing_autoevals -> evals -> src -> py -> root
+load_dotenv(repo_root / ".env")
 
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT")
 

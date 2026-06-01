@@ -1,10 +1,11 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from braintrust import load_prompt
 from openai import OpenAI
 
-# Load environment variables from .env file
-load_dotenv(dotenv_path="../../.env")
+# Load the single .env at the repo root (file -> basics -> src -> py -> root)
+load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 
 # Get the Braintrust project name from the environment variables
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT", "My App")

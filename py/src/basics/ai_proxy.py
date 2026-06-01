@@ -1,9 +1,10 @@
 import os
+from pathlib import Path
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# Load .env file from the root directory
-load_dotenv()
+# Load the single .env at the repo root (file -> basics -> src -> py -> root)
+load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 
 # Use any model that you have configured an API Key for in Braintrust
 # Accepted models are listed here: https://www.braintrust.dev/docs/guides/proxy#list-of-supported-models-and-providers

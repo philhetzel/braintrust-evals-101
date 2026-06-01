@@ -4,11 +4,12 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
-# Load .env file from py directory (works from any directory)
-py_dir = Path(__file__).parents[3]  # Go up 3 levels: file -> 03_write_custom_scorers -> evals -> src -> py
-load_dotenv(py_dir / ".env")
+# Load the single .env at the repo root (works from any directory)
+repo_root = Path(__file__).resolve().parents[4]  # file -> 03_write_custom_scorers -> evals -> src -> py -> root
+load_dotenv(repo_root / ".env")
 
 PROJECT_NAME = os.getenv("BRAINTRUST_PROJECT")
+MODEL = os.getenv("PREFERRED_MODEL")
 
 brevity_check = LLMClassifier(
     name="Brevity Check",
@@ -20,7 +21,7 @@ brevity_check = LLMClassifier(
     An output is too long if it is longer than 6 sentences. If it is too long, return "long". If it is not too long, return "brief".
     """,
     choice_scores={"brief": 1, "long": 0},
-    model="gpt-4o-mini"
+    model=MODEL
 )
 
 eval_summary = Eval(
@@ -30,7 +31,7 @@ eval_summary = Eval(
     scores=[brevity_check]
 )
 
-eval_summary
+# eval_summary
 
 # export BRAINTRUST_API_KEY=<YOUR_API_KEY>
 # braintrust eval src/evals/03_write_custom_scorers/write_custom_scorers.py

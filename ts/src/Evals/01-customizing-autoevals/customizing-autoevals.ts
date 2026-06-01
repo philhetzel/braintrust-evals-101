@@ -1,10 +1,12 @@
 import { Eval } from "braintrust";
 import { ExactMatch, EmbeddingSimilarity } from "autoevals";
 import dotenv from "dotenv";
+import * as path from "path";
 
-dotenv.config();
+// Load the single .env at the repo root (01-customizing-autoevals -> Evals -> src -> ts -> root)
+dotenv.config({ path: path.resolve(__dirname, "../../../../.env") });
 
-const PROJECT_NAME: string = process.env.BRAINTRUST_PROJECT || "My App";
+const PROJECT_NAME: string = process.env.BRAINTRUST_PROJECT || "multiturn-agent";
 
 const dataset = [
   {
